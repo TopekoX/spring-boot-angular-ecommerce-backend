@@ -5,11 +5,14 @@ package com.topekox.ecommerce.config;
  * for method REST GET read only and disable other method
  */
 
+import com.topekox.ecommerce.entity.Country;
 import com.topekox.ecommerce.entity.Product;
 import com.topekox.ecommerce.entity.ProductCategory;
+import com.topekox.ecommerce.entity.State;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
+import org.springframework.data.rest.core.mapping.ExposureConfigurer;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -35,18 +38,26 @@ public class DataRestConfig implements RepositoryRestConfigurer {
         // disable action REST
         HttpMethod[] unsupportedAction = {HttpMethod.PUT, HttpMethod.POST, HttpMethod.DELETE};
 
-        config.getExposureConfiguration()
-                .forDomainType(Product.class)
-                .withItemExposure((metdata, httpMethods) -> httpMethods.disable(unsupportedAction))
-                .withCollectionExposure((metdata, httpMethods) -> httpMethods.disable(unsupportedAction));
+        disableHttpMethod(config.getExposureConfiguration()
+                .forDomainType(Product.class), unsupportedAction);
 
-        config.getExposureConfiguration()
-                .forDomainType(ProductCategory.class)
-                .withItemExposure((metdata, httpMethods) -> httpMethods.disable(unsupportedAction))
-                .withCollectionExposure((metdata, httpMethods) -> httpMethods.disable(unsupportedAction));
+        disableHttpMethod(config.getExposureConfiguration()
+                .forDomainType(ProductCategory.class), unsupportedAction);
+
+        disableHttpMethod(config.getExposureConfiguration()
+                .forDomainType(Country.class), unsupportedAction);
+
+        disableHttpMethod(config.getExposureConfiguration()
+                .forDomainType(State.class), unsupportedAction);
 
         // call an internal helper method
         exposeId(config);
+    }
+
+    private void disableHttpMethod(ExposureConfigurer config, HttpMethod[] unsupportedAction) {
+        config
+                .withItemExposure((metdata, httpMethods) -> httpMethods.disable(unsupportedAction))
+                .withCollectionExposure((metdata, httpMethods) -> httpMethods.disable(unsupportedAction));
     }
 
     private void exposeId(RepositoryRestConfiguration config) {
