@@ -10,6 +10,7 @@ import com.topekox.ecommerce.entity.Product;
 import com.topekox.ecommerce.entity.ProductCategory;
 import com.topekox.ecommerce.entity.State;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.core.mapping.ExposureConfigurer;
@@ -28,6 +29,9 @@ public class DataRestConfig implements RepositoryRestConfigurer {
 
     private EntityManager entityManager;
 
+    @Value("${allowed.origin}")
+    private String[] allowedOrigin;
+
     @Autowired
     public DataRestConfig(EntityManager entityManager) {
         this.entityManager = entityManager;
@@ -36,7 +40,7 @@ public class DataRestConfig implements RepositoryRestConfigurer {
     @Override
     public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config, CorsRegistry cors) {
         // disable action REST
-        HttpMethod[] unsupportedAction = {HttpMethod.PUT, HttpMethod.POST, HttpMethod.DELETE};
+        HttpMethod[] unsupportedAction = {HttpMethod.PUT, HttpMethod.POST, HttpMethod.DELETE, HttpMethod.PATCH};
 
         disableHttpMethod(config.getExposureConfiguration()
                 .forDomainType(Product.class), unsupportedAction);
@@ -52,6 +56,9 @@ public class DataRestConfig implements RepositoryRestConfigurer {
 
         // call an internal helper method
         exposeId(config);
+
+        // configure CORS mapping
+        cors.addMapping(config.getBasePath() + "/**").allowedOrigins(allowedOrigin);
     }
 
     private void disableHttpMethod(ExposureConfigurer config, HttpMethod[] unsupportedAction) {
