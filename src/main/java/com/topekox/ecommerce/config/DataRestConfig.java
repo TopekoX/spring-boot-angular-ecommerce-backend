@@ -5,10 +5,7 @@ package com.topekox.ecommerce.config;
  * for method REST GET read only and disable other method
  */
 
-import com.topekox.ecommerce.entity.Country;
-import com.topekox.ecommerce.entity.Product;
-import com.topekox.ecommerce.entity.ProductCategory;
-import com.topekox.ecommerce.entity.State;
+import com.topekox.ecommerce.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -53,6 +50,9 @@ public class DataRestConfig implements RepositoryRestConfigurer {
 
         disableHttpMethod(config.getExposureConfiguration()
                 .forDomainType(State.class), unsupportedAction);
+
+        disableHttpMethod(config.getExposureConfiguration()
+                .forDomainType(Order.class), unsupportedAction);
 
         // call an internal helper method
         exposeId(config);
